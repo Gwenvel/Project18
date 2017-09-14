@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Project18.Data.LastFM;
 using Project18.Data;
-using System.Net.Http;
-using System.Runtime.Serialization.Json;
+using Project18.Data.LastFM;
 
 namespace Project18.Controllers
 {
@@ -23,19 +23,38 @@ namespace Project18.Controllers
             _context = context;
         }
 
+        // // GET: api/Artists
+        // [HttpGet]
+        // public IEnumerable<Data.Artist> GetArtist()
+        // {
+        //     var artists = ProcessArtists().Result.Select(n => new Data.Artist { Name = n.Name });
+        //     return artists;
+        // }
         // GET: api/Artists
+        // [HttpGet]
+        // public IEnumerable<Data.LastFM.Artist> GetArtist()
+        // {
+        //     var artists = ProcessArtists().Result;
+        //     return artists;
+        // }
         [HttpGet]
-        public IEnumerable<Data.Artist> GetArtist()
+        public async Task<IActionResult> GetArtist()
         {
-            var artists = ProcessArtists().Result.Select(n => new Data.Artist { Name = n.ArtistName });
-            return artists;
+            var artists = await ProcessArtists();
+
+            if (artists == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(artists);
         }
-        private static async Task<List<Data.LastFM.Artist>> ProcessArtists()
+        private async Task<List<Data.LastFM.Artist>> ProcessArtists()
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
             var serializer = new DataContractJsonSerializer(typeof(ArtistData));
-            var streamTask = client.GetStreamAsync("http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=87bdb2c24f5d7ea2e34ac5d1bdc419f1&format=json&limit=5");
+            var streamTask = client.GetStreamAsync("http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=87bdb2c24f5d7ea2e34ac5d1bdc419f1&format=json&limit=20");
             var artistData = serializer.ReadObject(await streamTask) as ArtistData;
             return artistData.Artists.ArtistList;
         }
@@ -59,80 +78,80 @@ namespace Project18.Controllers
             return Ok(artist);
         }
 
-        // PUT: api/Artists/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutArtist([FromRoute] int id, [FromBody] Data.Artist artist)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //     // PUT: api/Artists/5
+        //     [HttpPut("{id}")]
+        //     public async Task<IActionResult> PutArtist([FromRoute] int id, [FromBody] Artist artist)
+        //     {
+        //         if (!ModelState.IsValid)
+        //         {
+        //             return BadRequest(ModelState);
+        //         }
 
-            if (id != artist.ArtistId)
-            {
-                return BadRequest();
-            }
+        //         if (id != artist.ArtistId)
+        //         {
+        //             return BadRequest();
+        //         }
 
-            _context.Entry(artist).State = EntityState.Modified;
+        //         _context.Entry(artist).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ArtistExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //         try
+        //         {
+        //             await _context.SaveChangesAsync();
+        //         }
+        //         catch (DbUpdateConcurrencyException)
+        //         {
+        //             if (!ArtistExists(id))
+        //             {
+        //                 return NotFound();
+        //             }
+        //             else
+        //             {
+        //                 throw;
+        //             }
+        //         }
 
-            return NoContent();
-        }
+        //         return NoContent();
+        //     }
 
-        // POST: api/Artists
-        [HttpPost]
-        public async Task<IActionResult> PostArtist([FromBody] Data.Artist artist)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //     // POST: api/Artists
+        //     [HttpPost]
+        //     public async Task<IActionResult> PostArtist([FromBody] Artist artist)
+        //     {
+        //         if (!ModelState.IsValid)
+        //         {
+        //             return BadRequest(ModelState);
+        //         }
 
-            _context.Artist.Add(artist);
-            await _context.SaveChangesAsync();
+        //         _context.Artist.Add(artist);
+        //         await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetArtist", new { id = artist.ArtistId }, artist);
-        }
+        //         return CreatedAtAction("GetArtist", new { id = artist.ArtistId }, artist);
+        //     }
 
-        // DELETE: api/Artists/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteArtist([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //     // DELETE: api/Artists/5
+        //     [HttpDelete("{id}")]
+        //     public async Task<IActionResult> DeleteArtist([FromRoute] int id)
+        //     {
+        //         if (!ModelState.IsValid)
+        //         {
+        //             return BadRequest(ModelState);
+        //         }
 
-            var artist = await _context.Artist.SingleOrDefaultAsync(m => m.ArtistId == id);
-            if (artist == null)
-            {
-                return NotFound();
-            }
+        //         var artist = await _context.Artist.SingleOrDefaultAsync(m => m.ArtistId == id);
+        //         if (artist == null)
+        //         {
+        //             return NotFound();
+        //         }
 
-            _context.Artist.Remove(artist);
-            await _context.SaveChangesAsync();
+        //         _context.Artist.Remove(artist);
+        //         await _context.SaveChangesAsync();
 
-            return Ok(artist);
-        }
+        //         return Ok(artist);
+        //     }
 
-        private bool ArtistExists(int id)
-        {
-            return _context.Artist.Any(e => e.ArtistId == id);
-        }
+        //     private bool ArtistExists(int id)
+        //     {
+        //         return _context.Artist.Any(e => e.ArtistId == id);
+        //     }
     }
 }

@@ -16,7 +16,7 @@ namespace Project18.Data.LastFM
         }
 
         [DataMember(Name = "name")]
-        public string ArtistName { get; set; }
+        public string Name { get; set; }
 
         [DataMember(Name = "playcount")]
         public string Playcount { get; set; }
@@ -36,5 +36,4 @@ namespace Project18.Data.LastFM
         [DataMember(Name = "image")]
         public List<Image> ImageList { get; set; }
     }
-
 }

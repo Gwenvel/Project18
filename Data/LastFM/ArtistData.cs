@@ -13,5 +13,4 @@ namespace Project18.Data.LastFM
         [DataMember(Name = "artists")]
         public Artists Artists { get; set; }
     }
-
 }
