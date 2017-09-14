@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
-
 namespace Project18.Data.LastFM
 {
     [DataContract(Name = "artists")]

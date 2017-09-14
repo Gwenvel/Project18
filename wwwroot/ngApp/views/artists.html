@@ -1,0 +1,16 @@
+<div class="w3-card w3=white">
+    <table class="w3-table-all">
+        <tr>
+            <th>Artist</th>
+            <th>Played</th>
+            <th>Heard</th>
+            <th>Artist Page</th>
+        </tr>
+        <tr ng-repeat="artist in controller.artists">
+            <td>{{artist.name}}</td>
+            <td>{{artist.playcount}}</td>
+            <td>{{artist.listeners}}</td>
+            <td><a class="link"href="{{artist.url}}">Artist Page</a></td>
+        </tr>
+    </table>
+</div>
